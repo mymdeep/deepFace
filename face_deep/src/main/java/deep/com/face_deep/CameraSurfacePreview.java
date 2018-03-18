@@ -5,7 +5,7 @@ import java.io.IOException;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.util.Log;
+
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -31,7 +31,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
 
             mCamera.setPreviewDisplay(surfaceHolder);
         } catch(IOException e) {
-            Log.d(Constants.TAG, "surfaceCreated:"+e.getMessage());
+            L.e( "surfaceCreated:"+e.getMessage());
         }
     }
 
@@ -40,7 +40,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         try {
             mCamera.startPreview();
         }catch (Exception e) {
-            Log.d(Constants.TAG,"surfaceChanged:" + e.getMessage());
+            L.e("surfaceChanged:" + e.getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         if (mCamera != null) {
             mCamera.stopPreview();
         }
-        Log.d(Constants.TAG, "surfaceDestroyed() is called");
+        L.e( "surfaceDestroyed() is called");
     }
     public void takePicture(PictureCallback imageCallback) {
         mCamera.takePicture(null,null, imageCallback);
