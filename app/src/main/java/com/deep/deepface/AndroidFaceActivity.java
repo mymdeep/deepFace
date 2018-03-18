@@ -1,24 +1,17 @@
 package com.deep.deepface;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.media.FaceDetector.Face;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 import deep.com.face_deep.AndroidDetectUtils;
 import deep.com.face_deep.CameraSurfacePreview;
 import deep.com.face_deep.CheckCallback;
@@ -32,6 +25,7 @@ public class AndroidFaceActivity extends Activity{
     Button takeBtn;
     private CameraSurfacePreview mCameraSurPreview = null;
     private Camera mCamera;
+    private boolean isTaken = false;
     public static final int TAKE_PHOTO = 1;
     public static final int CROP_PHOTO = 2;
     @Override
@@ -45,11 +39,13 @@ public class AndroidFaceActivity extends Activity{
         if (list!=null&& list.size()>0){
             maxSize = list.get(0);
             for (Camera.Size s:list){
+                Log.e(Constants.TAG,"list w:"+s.width+"  h:"+s.height);
                 if (s.width>maxSize.width){
                     maxSize = s;
                 }
             }
         }
+        Log.e(Constants.TAG,"max w:"+maxSize.width+"  h:"+maxSize.height);
         return maxSize;
     }
     public void initUI() {
@@ -61,7 +57,6 @@ public class AndroidFaceActivity extends Activity{
 
       if (maxSize!=null){
           parameters.setPictureSize(maxSize.width,maxSize.height);
-          parameters.setPreviewSize(maxSize.width,maxSize.height);
       }
 
         try {
@@ -86,72 +81,47 @@ public class AndroidFaceActivity extends Activity{
         takeBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                //File outputImage = new File(Environment.getExternalStorageDirectory(),
-                //    "tempImage" + ".jpg");
-                //try {
-                //    if (outputImage.exists()) {
-                //        outputImage.delete();
-                //    }
-                //    outputImage.createNewFile();
-                //} catch (IOException e) {
-                //    e.printStackTrace();
-                //}
-                //imageUri = Uri.fromFile(outputImage);
-                //Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                //intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                //startActivityForResult(intent, TAKE_PHOTO);
-                mCameraSurPreview.takePicture(new PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] bytes, Camera camera) {
-                        FileOutputStream outStream = null;
-                        Log.e(Constants.TAG,"data = "+bytes.length);
-
-
-
-                        try {
-                            String name = System.currentTimeMillis()+"a";
-
-                            File outputImage = new File(Environment.getExternalStorageDirectory(),
-                                name + ".jpg");
-                            Log.e(Constants.TAG,"outputImage="+outputImage);
-                            try {
-                                if (outputImage.exists()) {
-                                    outputImage.delete();
-                                }
-                                outputImage.createNewFile();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            outStream = new FileOutputStream(outputImage);
-                            outStream.write(bytes);
-                            outStream.close();
-                             final Bitmap bitmap = BitmapFactory.decodeFile(outputImage.getPath()).copy(Bitmap.Config.RGB_565, true);
-                            //new Thread(new Runnable() {
-                            //    @Override
-                            //    public void run() {
-                                    AndroidDetectUtils.getInstance().check(bitmap, new CheckCallback() {
-                                        @Override
-                                        public void onSuccess(int count, Face[] faces) {
-                                            Toast.makeText(AndroidFaceActivity.this,"success count="+count+" face="+faces[0].eyesDistance(),Toast.LENGTH_LONG ).show();
-                                        }
-
-                                        @Override
-                                        public void onFail() {
-                                            Toast.makeText(AndroidFaceActivity.this,"fail",Toast.LENGTH_LONG ).show();
-
-                                        }
-                                    });
-                            //    }
-                            //}).start();
-
-                            Log.e(Constants.TAG, "Picture is taken and saved.");
-                        }catch (Exception e) {
-                            Log.e(Constants.TAG,"Error starting camera preview:"+e.getMessage());
-                        }
+                if (!isTaken){
+                    takePhoto();
+                }else {
+                    if (mCamera!=null){
+                        mCamera.startPreview();
                     }
-                });
+                    takeBtn.setText(R.string.take_photo);
+                    isTaken = false;
+
+
+                }
             }
         });
     }
+    private void takePhoto(){
+        mCameraSurPreview.takePicture(new PictureCallback() {
+            @Override
+            public void onPictureTaken(final byte[] bytes, final Camera camera) {
+                isTaken = true;
+                takeBtn.setText(R.string.again_take_photo);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AndroidDetectUtils.getInstance().check(bytes, new CheckCallback() {
+                            @Override
+                            public void onSuccess(int count, Face[] faces) {
+                                Log.e("xxxxxx","success "+" count="+count);
+                            }
 
+                            @Override
+                            public void onFail() {
+                                Log.e("xxxxxx","fail ");
+
+                            }
+                        });
+                    }
+                }).start();
+
+                Log.e(Constants.TAG, "Picture is taken and saved.");
+
+            }
+        });
+    }
 }

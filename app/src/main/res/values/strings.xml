@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DeepFace</string>
+    <string name="take_photo">照相</string>
+    <string name="again_take_photo">继续照相</string>
 </resources>
