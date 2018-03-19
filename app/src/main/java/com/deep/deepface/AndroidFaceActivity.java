@@ -38,9 +38,7 @@ public class AndroidFaceActivity extends Activity{
         mCamera.setDisplayOrientation(90);
        AndroidDetectUtils.getInstance().setCameraParam(mCamera);
         mCameraSurPreview = new CameraSurfacePreview(this,mCamera);
-
         preview.addView(mCameraSurPreview);
-
         takeBtn = (Button)findViewById(R.id.button_capture);
         takeBtn.setOnClickListener(new OnClickListener() {
             @Override

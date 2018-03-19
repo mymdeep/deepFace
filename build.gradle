@@ -3,21 +3,31 @@
 buildscript {
     
     repositories {
-        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
-        
-
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'//2.1.2对应1.3
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0" //
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
+ext {
+    siteUrl = 'https://github.com/mymdeep/deepFace'
+    gitUrl = 'https://github.com/mymdeep/deepFace.git'
+    group = "com.deep"
+    version = "1.1"
+    id = 'mymdeep'
+    name = 'wangfei'
+    email =  'mymdeep@vip.qq.com'
+    packaging = 'aar'
 
+}
 allprojects {
     repositories {
-        google()
+
         jcenter()
     }
 }
