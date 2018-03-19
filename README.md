@@ -51,6 +51,17 @@ CheckCallback回调，是对检测结果的处理。onSuccess是检测到了人�
 >该接口建议在异步线程中调用,如果图片很大，耗时较长。
 >
 
+### 权限问题
+图像识别本身不需要任何权限设置，但是如果使用相机需要添加
+```
+  <uses-permission android:name="android.permission.CAMERA" />
+```
+如果使用本地图片需要：
+```
+ <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
 ### 特殊接口
 #### 设置人脸个数
 
@@ -65,3 +76,6 @@ Constants.MAX_FACES = 5
 ```
 L.debug = true  //false为关闭
 ```
+
+## 总结
+详细使用情况可以参考demo。
